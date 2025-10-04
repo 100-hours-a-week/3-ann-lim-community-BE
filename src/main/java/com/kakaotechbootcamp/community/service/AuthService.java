@@ -9,12 +9,11 @@ import com.kakaotechbootcamp.community.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
-
-import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AuthService {
 
     private final UserRepository userRepository;
@@ -25,7 +24,7 @@ public class AuthService {
         User user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new CustomException(ErrorCode.INVALID_CREDENTIALS));
 
-        if(!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             throw new CustomException(ErrorCode.INVALID_CREDENTIALS);
         }
 

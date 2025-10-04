@@ -11,16 +11,24 @@ import lombok.NoArgsConstructor;
 public class PostCount {
 
     @Id
+    @Column(name = "post_id")
+    private Long id;
+
     @OneToOne
+    @MapsId
     @JoinColumn(name = "post_id", unique = true)
     private Post post;
 
-    @Column(name = "like_count")
+    @Column(name = "like_count", insertable = false, updatable = false)
     private Long likeCount;
 
-    @Column(name = "view_count")
+    @Column(name = "view_count", insertable = false, updatable = false)
     private Long viewCount;
 
-    @Column(name = "comment_count")
+    @Column(name = "comment_count", insertable = false, updatable = false)
     private Long commentCount;
+
+    public PostCount(Post post) {
+        this.post = post;
+    }
 }

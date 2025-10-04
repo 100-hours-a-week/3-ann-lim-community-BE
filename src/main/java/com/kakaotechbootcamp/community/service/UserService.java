@@ -2,6 +2,7 @@ package com.kakaotechbootcamp.community.service;
 
 import com.kakaotechbootcamp.community.dto.user.request.CreateUserRequestDto;
 import com.kakaotechbootcamp.community.dto.user.response.CreateUserResponseDto;
+import com.kakaotechbootcamp.community.dto.user.response.UserProfileResponseDto;
 import com.kakaotechbootcamp.community.entity.User;
 import com.kakaotechbootcamp.community.exception.CustomException;
 import com.kakaotechbootcamp.community.exception.ErrorCode;
@@ -9,25 +10,37 @@ import com.kakaotechbootcamp.community.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional(readOnly = true)
+    public UserProfileResponseDto getProfileImage() {
+
+        //Todo: JWT 구현 후 수정
+        User user = userRepository.findById(1L)
+                .orElseThrow();
+
+        return new UserProfileResponseDto(user.getProfileImage());
+    }
+
     public CreateUserResponseDto signup(CreateUserRequestDto createUserRequest) {
         
-        if(userRepository.existsByEmail(createUserRequest.getEmail())) {
+        if (userRepository.existsByEmail(createUserRequest.getEmail())) {
             throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
         }
 
-        if(userRepository.existsByNickname(createUserRequest.getNickname())) {
+        if (userRepository.existsByNickname(createUserRequest.getNickname())) {
             throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
         }
 
-        if(!createUserRequest.getPassword().equals(createUserRequest.getPasswordConfirm())) {
+        if (!createUserRequest.getPassword().equals(createUserRequest.getPasswordConfirm())) {
             throw new CustomException(ErrorCode.MISMATCH_PASSWORD);
         }
 

@@ -35,7 +35,8 @@ public class Image {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    public Image(String image, int orderNum) {
+    public Image(Post post, String image, int orderNum) {
+        this.post = post;
         this.image = image;
         this.orderNum = orderNum;
     }

@@ -27,16 +27,17 @@ public class Post {
     private String title;
     private String content;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", insertable = false, updatable = false)
     private LocalDateTime updatedAt;
 
-    @Column(name = "deleted_at", insertable = false, updatable = false)
+    @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    public Post(String title, String content) {
+    public Post(User user, String title, String content) {
+        this.user = user;
         this.title = title;
         this.content = content;
     }
