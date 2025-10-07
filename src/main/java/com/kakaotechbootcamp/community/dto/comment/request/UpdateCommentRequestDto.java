@@ -8,4 +8,8 @@ import lombok.Getter;
 public class UpdateCommentRequestDto {
 
     private String content;
+
+    public boolean isContentNull() {
+        return content == null;
+    }
 }

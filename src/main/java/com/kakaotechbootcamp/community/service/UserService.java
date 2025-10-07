@@ -24,7 +24,7 @@ public class UserService {
     public UserProfileResponseDto getProfileImage() {
 
         //Todo: JWT 구현 후 수정
-        User user = userRepository.findById(1L)
+        User user = userRepository.findByIdAndDeletedAtIsNull(1L)
                 .orElseThrow();
 
         return new UserProfileResponseDto(user.getProfileImage());
@@ -32,11 +32,11 @@ public class UserService {
 
     public CreateUserResponseDto signup(CreateUserRequestDto createUserRequest) {
         
-        if (userRepository.existsByEmail(createUserRequest.getEmail())) {
+        if (userRepository.existsByEmailAndDeletedAtIsNull(createUserRequest.getEmail())) {
             throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
         }
 
-        if (userRepository.existsByNickname(createUserRequest.getNickname())) {
+        if (userRepository.existsByNicknameAndDeletedAtIsNull(createUserRequest.getNickname())) {
             throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
         }
 
@@ -47,9 +47,9 @@ public class UserService {
         User user = new User(createUserRequest.getEmail(),
                 passwordEncoder.encode(createUserRequest.getPassword()),
                 createUserRequest.getNickname(), createUserRequest.getProfileImage());
-        User savedUser = userRepository.save(user);
+        userRepository.save(user);
 
-        return new CreateUserResponseDto(savedUser.getId());
+        return new CreateUserResponseDto(user.getId());
     }
 
 }

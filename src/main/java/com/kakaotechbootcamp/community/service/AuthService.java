@@ -21,7 +21,7 @@ public class AuthService {
 
     public UserLoginResponseDto login(UserLoginRequestDto loginRequest) {
 
-        User user = userRepository.findByEmail(loginRequest.getEmail())
+        User user = userRepository.findByEmailAndDeletedAtIsNull(loginRequest.getEmail())
                 .orElseThrow(() -> new CustomException(ErrorCode.INVALID_CREDENTIALS));
 
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {

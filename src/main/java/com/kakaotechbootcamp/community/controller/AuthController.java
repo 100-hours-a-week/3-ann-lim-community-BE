@@ -19,7 +19,8 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<?>> login(@Validated(ValidationOrder.class) @RequestBody UserLoginRequestDto loginRequest) {
+    public ResponseEntity<ApiResponse<?>> login(
+            @Validated(ValidationOrder.class) @RequestBody UserLoginRequestDto loginRequest) {
 
         UserLoginResponseDto response = authService.login(loginRequest);
 

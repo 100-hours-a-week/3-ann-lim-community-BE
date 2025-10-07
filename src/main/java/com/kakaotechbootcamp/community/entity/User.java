@@ -4,12 +4,16 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class User {
 
     @Id
@@ -25,11 +29,12 @@ public class User {
     private String profileImage;
 
 
-    @Column(name = "created_at", insertable = false, updatable = false)
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-
-    @Column(name = "updated_at", insertable = false, updatable = false)
+    @LastModifiedDate
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @Column(name = "deleted_at")
@@ -44,5 +49,13 @@ public class User {
 
     public void delete() {
         this.deletedAt = LocalDateTime.now();
+    }
+
+    public boolean isDeleted() {
+        return this.deletedAt != null;
+    }
+
+    public void restore() {
+        this.deletedAt = null;
     }
 }

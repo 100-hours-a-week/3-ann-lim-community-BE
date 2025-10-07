@@ -19,16 +19,26 @@ public class PostCount {
     @JoinColumn(name = "post_id", unique = true)
     private Post post;
 
-    @Column(name = "like_count", insertable = false, updatable = false)
-    private Long likeCount;
+    @Column(name = "like_count")
+    private Long likeCount = 0L;
 
-    @Column(name = "view_count", insertable = false, updatable = false)
-    private Long viewCount;
+    @Column(name = "view_count")
+    private Long viewCount = 0L;
 
-    @Column(name = "comment_count", insertable = false, updatable = false)
-    private Long commentCount;
+    @Column(name = "comment_count")
+    private Long commentCount = 0L;
 
     public PostCount(Post post) {
         this.post = post;
+    }
+
+    public void increaseLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decreaseLikeCount() {
+        if (this.likeCount > 0) {
+            this.likeCount--;
+        }
     }
 }

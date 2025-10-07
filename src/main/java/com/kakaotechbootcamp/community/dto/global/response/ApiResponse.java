@@ -11,7 +11,5 @@ public class ApiResponse<T> {
     private final boolean success;
     private final int status;
     private final String message;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private final T data;
-
 }

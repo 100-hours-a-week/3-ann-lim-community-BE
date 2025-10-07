@@ -1,24 +1,29 @@
 package com.kakaotechbootcamp.community.dto.comment.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
 @Builder
 public class CommentsResponseDto {
 
-    private List<CommentData> comments;
-    private Long nextCursor;
-    private boolean hasMore;
+    List<CommentSummaryResponseDto> comments;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime lastCommentCreatedAt;
+
+    private Long lastCommentId;
 
     public static CommentsResponseDto of (
-            List<CommentData> comments, Long nextCursor, boolean hasMore) {
+            List<CommentSummaryResponseDto> comments, LocalDateTime lastCommentCreatedAt, Long lastCommentId) {
         return CommentsResponseDto.builder()
                 .comments(comments)
-                .nextCursor(nextCursor)
-                .hasMore(hasMore)
+                .lastCommentCreatedAt(lastCommentCreatedAt)
+                .lastCommentId(lastCommentId)
                 .build();
     }
 }

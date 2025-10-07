@@ -9,12 +9,16 @@ import java.util.List;
 @Builder
 public class EditPostResponseDto {
 
-    private PostInfo post;
+    private Long postId;
+    private String title;
+    private String content;
     private List<ImageInfo> images;
 
-    public static EditPostResponseDto of(PostInfo post, List<ImageInfo> images) {
+    public static EditPostResponseDto of(Long postId, String title, String content, List<ImageInfo> images) {
         return EditPostResponseDto.builder()
-                .post(post)
+                .postId(postId)
+                .title(title)
+                .content(content)
                 .images(images)
                 .build();
     }
