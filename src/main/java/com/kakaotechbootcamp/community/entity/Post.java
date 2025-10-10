@@ -59,6 +59,10 @@ public class Post {
         }
     }
 
+    public void setPostCountNull() {
+        this.postCount = null;
+    }
+
     public void delete() {
         this.deletedAt = LocalDateTime.now();
     }

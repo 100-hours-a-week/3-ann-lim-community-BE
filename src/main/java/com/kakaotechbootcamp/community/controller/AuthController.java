@@ -33,4 +33,19 @@ public class AuthController {
                         .data(response)
                         .build());
     }
+
+    @DeleteMapping
+    public ResponseEntity<ApiResponse<?>> logout() {
+
+        authService.logout();
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponse.builder()
+                        .success(true)
+                        .status(HttpStatus.OK.value())
+                        .message("로그아웃 성공")
+                        .data(null)
+                        .build());
+    }
 }

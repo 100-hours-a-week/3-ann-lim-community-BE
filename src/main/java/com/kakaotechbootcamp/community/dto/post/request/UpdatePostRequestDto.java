@@ -17,12 +17,19 @@ public class UpdatePostRequestDto {
     @Size(max = 26, message = "{max.post.title}", groups = LengthGroup.class)
     private String title;
 
-    @NotBlank(message = "{required.post.title}", groups = RequiredGroup.class)
     private String content;
 
     private List<String> postImages;
 
     public boolean isAllFieldsNull() {
         return title == null && content == null && (postImages == null || postImages.isEmpty());
+    }
+
+    public boolean isTitleEmpty() {
+        return title.trim().isEmpty();
+    }
+
+    public boolean isContentEmpty() {
+        return content.trim().isEmpty();
     }
 }

@@ -30,4 +30,8 @@ public class AuthService {
 
         return new UserLoginResponseDto(user.getId());
     }
+
+    //Todo: JWT 구현 후 수정
+    public void logout() {
+    }
 }

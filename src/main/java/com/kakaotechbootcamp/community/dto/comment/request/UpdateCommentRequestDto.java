@@ -9,7 +9,7 @@ public class UpdateCommentRequestDto {
 
     private String content;
 
-    public boolean isContentNull() {
-        return content == null;
+    public boolean isContentInvalid() {
+        return content == null || content.trim().isEmpty();
     }
 }

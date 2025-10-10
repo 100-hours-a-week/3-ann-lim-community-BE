@@ -13,8 +13,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    List<Comment> findByPostIdAndDeletedAtIsNull(Long postId);
+    List<Comment> findAllByPostIdAndDeletedAtIsNull(Long postId);
+    List<Comment> findAllByUserIdAndDeletedAtIsNull(Long userId);
     Optional<Comment> findByIdAndPostIdAndDeletedAtIsNull(Long commentId, Long postId);
+
+    @Query("SELECT DISTINCT c.post.id FROM Comment c WHERE c.user.id = :userId")
+    List<Long> findPostIdsByUserId(@Param("userId") Long userId);
+
 
     @Query("""
     SELECT new com.kakaotechbootcamp.community.dto.comment.response.CommentSummaryResponseDto(

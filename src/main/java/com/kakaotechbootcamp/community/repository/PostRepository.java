@@ -16,6 +16,7 @@ import java.util.Optional;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
     Optional<Post> findByIdAndDeletedAtIsNull(Long postId);
+    List<Post> findAllByUserIdAndDeletedAtIsNull(Long userId);
 
     @Query("""
         SELECT new com.kakaotechbootcamp.community.dto.post.response.PostSummaryResponseDto(

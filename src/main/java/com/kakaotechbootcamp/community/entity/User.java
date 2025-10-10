@@ -47,6 +47,21 @@ public class User {
         this.profileImage = profileImage;
     }
 
+    public void updateUserInfo(String nickname, String profileImage) {
+
+        if (nickname != null) {
+            this.nickname = nickname;
+        }
+
+        if (profileImage != null) {
+            this.profileImage = profileImage;
+        }
+    }
+
+    public void updateUserPassword(String password) {
+        this.password = password;
+    }
+
     public void delete() {
         this.deletedAt = LocalDateTime.now();
     }

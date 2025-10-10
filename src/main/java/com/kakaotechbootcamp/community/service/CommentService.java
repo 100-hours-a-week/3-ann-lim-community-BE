@@ -8,10 +8,12 @@ import com.kakaotechbootcamp.community.dto.comment.response.CreateCommentRespons
 import com.kakaotechbootcamp.community.dto.comment.response.UpdateCommentResponseDto;
 import com.kakaotechbootcamp.community.entity.Comment;
 import com.kakaotechbootcamp.community.entity.Post;
+import com.kakaotechbootcamp.community.entity.PostCount;
 import com.kakaotechbootcamp.community.entity.User;
 import com.kakaotechbootcamp.community.exception.CustomException;
 import com.kakaotechbootcamp.community.exception.ErrorCode;
 import com.kakaotechbootcamp.community.repository.CommentRepository;
+import com.kakaotechbootcamp.community.repository.PostCountRepository;
 import com.kakaotechbootcamp.community.repository.PostRepository;
 import com.kakaotechbootcamp.community.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ public class CommentService {
 
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    private final PostCountRepository postCountRepository;
     private final CommentRepository commentRepository;
 
     @Transactional(readOnly = true)
@@ -63,12 +66,21 @@ public class CommentService {
         Comment comment = new Comment(post, user, createCommentRequest.getContent());
         commentRepository.save(comment);
 
+        PostCount postCount = postCountRepository.findById(post.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_COUNT_NOT_FOUND));
+
+        postCount.increaseCommentCount();
+
         return new CreateCommentResponseDto(comment.getId());
     }
 
     public UpdateCommentResponseDto updateComment(Long postId, Long commentId, UpdateCommentRequestDto updateCommentRequest) {
 
-        if (updateCommentRequest.isContentNull()) {
+        if (updateCommentRequest == null) {
+            throw new CustomException(ErrorCode.INVALID_REQUEST_BODY);
+        }
+
+        if (updateCommentRequest.isContentInvalid()) {
             throw new CustomException(ErrorCode.NO_UPDATE_CONTENT);
         }
 
@@ -81,10 +93,14 @@ public class CommentService {
     }
 
     public void deleteComment(Long postId, Long commentId) {
+
         Comment comment = commentRepository.findByIdAndPostIdAndDeletedAtIsNull(commentId, postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
         comment.delete();
 
-        return;
+        PostCount postCount = postCountRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_COUNT_NOT_FOUND));
+
+        postCount.decreaseCommentCount();
     }
 }

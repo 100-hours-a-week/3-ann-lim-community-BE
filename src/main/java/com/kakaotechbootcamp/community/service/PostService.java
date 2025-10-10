@@ -1,5 +1,6 @@
 package com.kakaotechbootcamp.community.service;
 
+import com.kakaotechbootcamp.community.cache.ViewCountCache;
 import com.kakaotechbootcamp.community.dto.post.request.CreatePostRequestDto;
 import com.kakaotechbootcamp.community.dto.post.request.UpdatePostRequestDto;
 import com.kakaotechbootcamp.community.dto.post.response.*;
@@ -17,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +31,7 @@ public class PostService {
     private final PostLikeRepository postLikeRepository;
     private final PostCountRepository postCountRepository;
     private final CommentRepository commentRepository;
+    private final ViewCountCache viewCountCache;
 
     @Transactional(readOnly = true)
     public PostsResponseDto getPosts(LocalDateTime lastPostCreatedAt, Long lastPostId) {
@@ -81,7 +82,7 @@ public class PostService {
         Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
-        List<Image> images = imageRepository.findByPostIdAndDeletedAtIsNull(post.getId());
+        List<Image> images = imageRepository.findAllByPostIdAndDeletedAtIsNull(post.getId());
 
         List<ImageInfo> imageInfoList = images.stream().
                 map(image -> ImageInfo.of(
@@ -90,10 +91,12 @@ public class PostService {
                         image.getOrderNum()))
                 .toList();
 
-        PostCount postCount = postCountRepository.findById(post.getId())
+        PostCount postCount = postCountRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_COUNT_NOT_FOUND));
 
         User user = post.getUser();
+
+        viewCountCache.increment(postId);
 
         return PostResponseDto.of(
                 post.getId(), post.getTitle(), post.getContent(), post.getCreatedAt(), post.getUpdatedAt(),
@@ -108,7 +111,7 @@ public class PostService {
         Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
-        List<Image> images = imageRepository.findByPostIdAndDeletedAtIsNull(postId);
+        List<Image> images = imageRepository.findAllByPostIdAndDeletedAtIsNull(postId);
 
         List<ImageInfo> imageInfoList = images.stream().
                 map(image -> ImageInfo.of(
@@ -130,12 +133,24 @@ public class PostService {
             throw new CustomException(ErrorCode.NO_UPDATE_CONTENT);
         }
 
+        if (updatePostRequest.getTitle() != null) {
+            if (updatePostRequest.isTitleEmpty()) {
+                throw new CustomException(ErrorCode.INVALID_TITLE);
+            }
+        }
+
+        if (updatePostRequest.getContent() != null) {
+            if (updatePostRequest.isContentEmpty()) {
+                throw new CustomException(ErrorCode.INVALID_CONTENT);
+            }
+        }
+
         Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         post.update(updatePostRequest.getTitle(), updatePostRequest.getContent());
 
-        List<Image> existingImages = imageRepository.findByPostIdAndDeletedAtIsNull(post.getId());
+        List<Image> existingImages = imageRepository.findAllByPostIdAndDeletedAtIsNull(postId);
 
         List<String> newImages = updatePostRequest.getPostImages();
 
@@ -177,17 +192,22 @@ public class PostService {
     }
 
     public void deletePost(Long postId) {
+
         Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+
+        post.setPostCountNull();
         post.delete();
 
-        List<Image> images = imageRepository.findByPostIdAndDeletedAtIsNull(postId);
+        List<Image> images = imageRepository.findAllByPostIdAndDeletedAtIsNull(postId);
         images.forEach(Image::delete);
 
-        List<Comment> comments = commentRepository.findByPostIdAndDeletedAtIsNull(postId);
+        List<Comment> comments = commentRepository.findAllByPostIdAndDeletedAtIsNull(postId);
         comments.forEach(Comment::delete);
 
-        return;
+        postLikeRepository.deleteAllByPostId(postId);
+
+        postCountRepository.deleteById(postId);
     }
 
     public CreateLikeResponseDto addLike(Long postId) {
