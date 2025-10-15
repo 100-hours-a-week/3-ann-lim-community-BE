@@ -17,7 +17,7 @@ public class CreateUserRequestDto {
     private String email;
 
     @NotBlank(message = "{required.user.password}", groups = RequiredGroup.class)
-    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*(),.?\":{}|<>]).{8,20}$",
+    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*(),.?\":{}|<>])[^\\s]{8,20}$\n",
             message = "{invalid.user.password}", groups = FormatGroup.class)
     private String password;
 
