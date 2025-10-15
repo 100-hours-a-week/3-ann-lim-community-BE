@@ -16,6 +16,10 @@ public class UserLoginRequestDto {
 
     @NotBlank(message = "{required.user.email}", groups = RequiredGroup.class)
     @Email(message = "{invalid.user.email}", groups = FormatGroup.class)
+    @Pattern(
+            regexp = "^(?!.*\\..)(?!\\.)(?!.*\\.$)[A-Za-z0-9._%+-]+@([A-Za-z0-9]+(-[A-Za-z0-9]+)*\\.)+[A-Za-z]{2,}$",
+            message = "{invalid.user.email}", groups = FormatGroup.class
+    )
     @Size(min = 6, message = "{invalid.user.email}", groups = LengthGroup.class)
     private String email;
 
