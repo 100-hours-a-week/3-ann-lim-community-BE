@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class UpdateUserPasswordRequestDto {
 
     @NotBlank(message = "{required.user.password}", groups = RequiredGroup.class)
-    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*(),.?\":{}|<>])[^\\s]{8,20}$\n",
+    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*(),.?\":{}|<>])[^\\s]{8,20}$",
             message = "{invalid.user.password}", groups = FormatGroup.class)
     private String password;
 

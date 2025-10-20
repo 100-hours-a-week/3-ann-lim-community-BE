@@ -1,12 +1,12 @@
 const email = document.getElementById("email");
 const password = document.getElementById("password");
-const confirmPassword = document.getElementById("confirmPassword");
+const passwordConfirm = document.getElementById("passwordConfirm");
 const nickname = document.getElementById("nickname");
 const signupBtn = document.getElementById("signupBtn");
 
 const emailHelper = document.getElementById("emailHelper");
 const passwordHelper = document.getElementById("passwordHelper");
-const confirmPasswordHelper = document.getElementById("confirmPasswordHelper");
+const passwordConfirmHelper = document.getElementById("passwordConfirmHelper");
 const nicknameHelper = document.getElementById("nicknameHelper");
 
 const backBtn = document.querySelector(".back-btn")
@@ -45,13 +45,13 @@ function validatePassword(input) {
 }
 
 // 비밀번호 확인 검증
-function validateConfirmPassword(input) {
+function validatePasswordConfirm(input) {
 
     if (!input.trim()) {
         return "비밀번호를 한번 더 입력해주세요.";
     }
 
-    if (password.value !== confirmPassword.value) {
+    if (password.value !== passwordConfirm.value) {
       return "비밀번호가 다릅니다.";
     }
 
@@ -80,10 +80,10 @@ function validateNickname(input) {
 function checkFormValidity() {
     const emailMsg = validateEmail(email.value);
     const passwordMsg = validatePassword(password.value);
-    const confirmPasswordMsg = validateConfirmPassword(confirmPassword.value);
+    const passwordConfirmMsg = validatePasswordConfirm(passwordConfirm.value);
     const nicknameMsg = validateNickname(nickname.value);
 
-    const allValid = !emailMsg && !passwordMsg && !confirmPasswordMsg && !nicknameMsg;
+    const allValid = !emailMsg && !passwordMsg && !passwordConfirmMsg && !nicknameMsg;
     signupBtn.disabled = !allValid;
     signupBtn.classList.toggle("active", allValid);
 }
@@ -100,9 +100,9 @@ password.addEventListener("input", () => {
     checkFormValidity();
 });
 
-confirmPassword.addEventListener("input", () => {
-    const msg = validateConfirmPassword(confirmPassword.value);
-    confirmPasswordHelper.textContent = msg;
+passwordConfirm.addEventListener("input", () => {
+    const msg = validatePasswordConfirm(passwordConfirm.value);
+    passwordConfirmHelper.textContent = msg;
     checkFormValidity();
 });
 
@@ -122,6 +122,7 @@ const profileInput = document.getElementById("profileInput");
 profileImg.addEventListener("click", () => profileInput.click());
 
 let hasImage = false;
+let selectedFile = null;
 
 profileInput.addEventListener("change", (e) => {
     const image = e.target.files[0];
@@ -132,6 +133,7 @@ profileInput.addEventListener("change", (e) => {
             profilePreview.src = "../assets/default-profile.png";
             plusIcon.style.display = "block";
             hasImage = false;
+            selectedFile = null;
         }
         return;
     }
@@ -142,6 +144,7 @@ profileInput.addEventListener("change", (e) => {
         profilePreview.src = event.target.result;
         plusIcon.style.display = "none";
         hasImage = true;
+        selectedFile = image;
     };
     reader.readAsDataURL(image);
 });
@@ -164,12 +167,14 @@ async function uploadImageToS3(file) {
         throw new Error(result.message);
         }
 
-        const imageUrls = result.data.imageUrls;
+        const imageUrls = result.data.images;
 
         return imageUrls[0];
 
     } catch (error) {
         alert("이미지 업로드 중 오류가 발생했습니다.");
+
+        return null;
     }
 }
 
@@ -180,16 +185,19 @@ document.getElementById("signupForm").addEventListener("submit", async (e) => {
     try {
         let profileImageUrl = null;
 
-        if (profilePreview) {
-            profileImageUrl = await uploadImageToS3(profilePreview);
+        if (selectedFile) {
+            profileImageUrl = await uploadImageToS3(selectedFile);
         }
 
         const response = await fetch("http://localhost:8080/users", {
             method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
             body: JSON.stringify({
                 email: email.value,
                 password: password.value,
-                password_confirm: confirmPassword.value,
+                password_confirm: passwordConfirm.value,
                 nickname: nickname.value,
                 profile_image: profileImageUrl,
             }),
