@@ -9,7 +9,6 @@ import com.kakaotechbootcamp.community.dto.global.response.ApiResponse;
 import com.kakaotechbootcamp.community.service.CommentService;
 import com.kakaotechbootcamp.community.validation.ValidationOrder;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
