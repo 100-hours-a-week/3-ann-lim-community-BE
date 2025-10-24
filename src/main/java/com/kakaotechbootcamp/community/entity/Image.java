@@ -25,7 +25,13 @@ public class Image {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    private String image;
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    @Column(name = "image_name")
+    private String imageName;
+
+    private String extension;
 
     @Column(name = "order_num")
     private int orderNum;
@@ -41,9 +47,11 @@ public class Image {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    public Image(Post post, String image, int orderNum) {
+    public Image(Post post, String imageUrl, String imageName, String extension, int orderNum) {
         this.post = post;
-        this.image = image;
+        this.imageUrl = imageUrl;
+        this.imageName = imageName;
+        this.extension = extension;
         this.orderNum = orderNum;
     }
 

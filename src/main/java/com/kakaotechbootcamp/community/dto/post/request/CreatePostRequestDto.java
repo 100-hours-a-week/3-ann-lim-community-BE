@@ -20,5 +20,5 @@ public class CreatePostRequestDto {
     @NotBlank(message = "{required.post.title}", groups = RequiredGroup.class)
     private String content;
 
-    private List<String> postImages;
+    private List<ImageMetaInfo> postImages;
 }

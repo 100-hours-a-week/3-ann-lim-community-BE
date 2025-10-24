@@ -2,6 +2,7 @@ package com.kakaotechbootcamp.community.service;
 
 import com.kakaotechbootcamp.community.cache.ViewCountCache;
 import com.kakaotechbootcamp.community.dto.post.request.CreatePostRequestDto;
+import com.kakaotechbootcamp.community.dto.post.request.ImageMetaInfo;
 import com.kakaotechbootcamp.community.dto.post.request.UpdatePostRequestDto;
 import com.kakaotechbootcamp.community.dto.post.response.*;
 import com.kakaotechbootcamp.community.dto.postlike.response.CreateLikeResponseDto;
@@ -62,10 +63,10 @@ public class PostService {
         Post post = new Post(user, createPostRequest.getTitle(), createPostRequest.getContent());
         postRepository.save(post);
 
-        List<String> images = createPostRequest.getPostImages();
+        List<ImageMetaInfo> images = createPostRequest.getPostImages();
         if (images != null && !images.isEmpty()) {
             for (int i = 0; i < images.size(); i++) {
-                Image image = new Image(post, images.get(i), i+1);
+                Image image = new Image(post, images.get(i).getImageUrl(), images.get(i).getImageName(), images.get(i).getExtension(), i+1);
                 imageRepository.save(image);
             }
         }
@@ -79,22 +80,28 @@ public class PostService {
     @Transactional(readOnly = true)
     public PostResponseDto getPost(Long postId) {
 
+        //Todo: JWT 구현 후 수정
+        User user = userRepository.findByIdAndDeletedAtIsNull(1L)
+                .orElseThrow();
+
         Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
-        List<Image> images = imageRepository.findAllByPostIdAndDeletedAtIsNull(post.getId());
+        List<Image> images = imageRepository.findAllByPostIdAndDeletedAtIsNull(postId);
 
-        List<ImageInfo> imageInfoList = images.stream().
-                map(image -> ImageInfo.of(
+        List<ImageDisplayInfo> imageInfoList = images.stream().
+                map(image -> ImageDisplayInfo.of(
                         image.getId(),
-                        image.getImage(),
+                        image.getImageUrl(),
                         image.getOrderNum()))
                 .toList();
 
         PostCount postCount = postCountRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_COUNT_NOT_FOUND));
 
-        User user = post.getUser();
+        boolean isLiked = postLikeRepository.existsByPostIdAndUserId(postId, user.getId());
+
+        User author = post.getUser();
 
         viewCountCache.increment(postId);
 
@@ -102,7 +109,8 @@ public class PostService {
                 post.getId(), post.getTitle(), post.getContent(), post.getCreatedAt(), post.getUpdatedAt(),
                 imageInfoList,
                 postCount.getLikeCount(), postCount.getViewCount(), postCount.getCommentCount(),
-                user.getId(), user.getNickname(), user.getProfileImage());
+                isLiked,
+                author.getId(), author.getNickname(), author.getProfileImage());
     }
 
     @Transactional(readOnly = true)
@@ -113,10 +121,12 @@ public class PostService {
 
         List<Image> images = imageRepository.findAllByPostIdAndDeletedAtIsNull(postId);
 
-        List<ImageInfo> imageInfoList = images.stream().
-                map(image -> ImageInfo.of(
+        List<ImageFullInfo> imageInfoList = images.stream().
+                map(image -> ImageFullInfo.of(
                         image.getId(),
-                        image.getImage(),
+                        image.getImageUrl(),
+                        image.getImageName(),
+                        image.getExtension(),
                         image.getOrderNum()))
                 .toList();
 
@@ -152,22 +162,19 @@ public class PostService {
 
         List<Image> existingImages = imageRepository.findAllByPostIdAndDeletedAtIsNull(postId);
 
-        List<String> newImages = updatePostRequest.getPostImages();
+        List<ImageMetaInfo> newImages = updatePostRequest.getPostImages();
 
-        if (newImages == null) {
-            // 수정할 이미지가 없음
-        }
-        else if (newImages.isEmpty()) {
+        if (newImages == null && newImages.isEmpty()) {
             for (Image image : existingImages) {
                 image.delete();
             }
         }
         else {
             Map<String, Image> existingMap = existingImages.stream()
-                    .collect(Collectors.toMap(Image::getImage, image -> image));
+                    .collect(Collectors.toMap(Image::getImageUrl, image -> image));
 
             for (int i = 0; i < newImages.size(); i++) {
-                String url = newImages.get(i);
+                String url = newImages.get(i).getImageUrl();
                 int newOrder = i + 1;
 
                 if (existingMap.containsKey(url)) {
@@ -178,7 +185,7 @@ public class PostService {
                     existingMap.remove(url);
                 }
                 else {
-                    Image newImage = new Image(post, url, newOrder);
+                    Image newImage = new Image(post, url, newImages.get(i).getImageName(), newImages.get(i).getExtension(), newOrder);
                     imageRepository.save(newImage);
                 }
             }

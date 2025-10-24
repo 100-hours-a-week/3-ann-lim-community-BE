@@ -12,9 +12,9 @@ public class EditPostResponseDto {
     private Long postId;
     private String title;
     private String content;
-    private List<ImageInfo> images;
+    private List<ImageFullInfo> images;
 
-    public static EditPostResponseDto of(Long postId, String title, String content, List<ImageInfo> images) {
+    public static EditPostResponseDto of(Long postId, String title, String content, List<ImageFullInfo> images) {
         return EditPostResponseDto.builder()
                 .postId(postId)
                 .title(title)

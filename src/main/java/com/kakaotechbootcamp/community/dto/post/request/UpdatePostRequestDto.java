@@ -1,9 +1,6 @@
 package com.kakaotechbootcamp.community.dto.post.request;
 
 import com.kakaotechbootcamp.community.validation.group.LengthGroup;
-import com.kakaotechbootcamp.community.validation.group.RequiredGroup;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +16,7 @@ public class UpdatePostRequestDto {
 
     private String content;
 
-    private List<String> postImages;
+    private List<ImageMetaInfo> postImages;
 
     public boolean isAllFieldsNull() {
         return title == null && content == null && (postImages == null || postImages.isEmpty());

@@ -12,6 +12,7 @@ public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
     Optional<PostLike> findByPostIdAndUserId(Long postId, Long userId);
     void deleteAllByPostId(Long postId);
     void deleteAllByUserId(Long userId);
+    boolean existsByPostIdAndUserId(Long postId, Long userId);
 
     @Query("SELECT DISTINCT l.post.id FROM PostLike l WHERE l.user.id = :userId")
     List<Long> findPostIdsByUserId(@Param("userId") Long userId);

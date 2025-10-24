@@ -21,11 +21,13 @@ public class PostResponseDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
 
-    private List<ImageInfo> images;
+    private List<ImageDisplayInfo> images;
 
     private Long likeCount;
     private Long viewCount;
     private Long commentCount;
+
+    private boolean isLiked;
 
     private Long userId;
     private String nickname;
@@ -33,8 +35,9 @@ public class PostResponseDto {
 
     public static PostResponseDto of(Long postId, String title, String content,
                                      LocalDateTime createdAt, LocalDateTime updatedAt,
-                                     List<ImageInfo> images,
+                                     List<ImageDisplayInfo> images,
                                      Long likeCount, Long viewCount, Long commentCount,
+                                     boolean isLiked,
                                      Long userId, String nickname, String profileImage) {
         return PostResponseDto.builder()
                 .postId(postId)
@@ -46,6 +49,7 @@ public class PostResponseDto {
                 .likeCount(likeCount)
                 .viewCount(viewCount)
                 .commentCount(commentCount)
+                .isLiked(isLiked)
                 .userId(userId)
                 .nickname(nickname)
                 .profileImage(profileImage)
