@@ -2,7 +2,6 @@ package com.kakaotechbootcamp.community.controller;
 
 import com.kakaotechbootcamp.community.dto.global.response.ApiResponse;
 import com.kakaotechbootcamp.community.dto.image.response.CreateImageUrlResponseDto;
-import com.kakaotechbootcamp.community.dto.post.response.PostsResponseDto;
 import com.kakaotechbootcamp.community.service.ImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -11,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController

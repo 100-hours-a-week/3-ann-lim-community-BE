@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>이용약관 | 아무 말 대잔치</title>
+    <link rel="stylesheet" th:href="@{/css/policy.css}">
+</head>
+<body>
+    <header class="header">
+        <button class="back-btn"><</button>
+        <h1>아무 말 대잔치 이용약관</h1>
+    </header>
+
+    <main class="policy-container">
+        <section>
+            <h2>제1조 (목적)</h2>
+            <p>이 약관은 아무 말 대잔치(이하 ‘커뮤니티’)가 제공하는 서비스의 이용과 관련하여 회원과 커뮤니티 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.</p>
+        </section>
+
+        <section>
+            <h2>제2조 (용어의 정의)</h2>
+            <p>‘회원’이라 함은 본 약관에 동의하고 서비스를 이용하는 이용자를 의미합니다.</p>
+        </section>
+
+        <section>
+            <h2>제3조 (약관의 효력 및 변경)</h2>
+            <p>커뮤니티는 필요 시 본 약관을 변경할 수 있으며, 변경 시 공지사항을 통해 회원에게 알립니다.</p>
+        </section>
+
+        <section>
+            <h2>제4조 (회원의 의무)</h2>
+            <ul>
+                <li>회원은 타인의 정보를 도용하거나 허위 정보를 기재하지 않습니다.</li>
+                <li>회원은 서비스 이용 시 법령 및 본 약관을 준수해야 합니다.</li>
+                <li>회원은 타인에게 불쾌감을 주거나 명예를 훼손하는 게시물을 작성하지 않습니다.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>제5조 (서비스 이용 제한)</h2>
+            <p>커뮤니티는 회원이 본 약관을 위반할 경우 사전 통보 없이 서비스 이용을 제한할 수 있습니다.</p>
+        </section>
+
+        <section>
+            <h2>제6조 (게시물의 저작권)</h2>
+            <p>회원이 작성한 게시물의 저작권은 회원에게 있으며, 커뮤니티는 서비스 운영 및 홍보를 위해 합리적인 범위 내에서 이를 사용할 수 있습니다.</p>
+        </section>
+
+        <section>
+            <h2>제7조 (면책조항)</h2>
+            <p>커뮤니티는 회원의 귀책사유로 인해 발생한 손해에 대해서는 책임을 지지 않습니다.</p>
+        </section>
+
+        <p class="date">최종 수정일: 2025년 10월 26일</p>
+    </main>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const from = params.get("from");
+
+        const backBtn = document.querySelector(".back-btn");
+
+        backBtn.addEventListener("click", () => {
+            if (from === "login") {
+                window.location.href = "http://localhost:3000/login";
+            } else if (from === "signup") {
+                window.location.href = "http://localhost:3000/signup";
+            } else {
+                window.history.back();
+            }
+        });
+    </script>
+
+    <footer th:fragment="footer" class="footer">
+        <p>
+            <a th:href="@{/terms}">이용약관</a> |
+            <a th:href="@{/privacy}">개인정보처리방침</a>
+        </p>
+        <p class="copyright">© 2025 아무 말 대잔치 All rights reserved.</p>
+    </footer>
+</body>
+</html>
