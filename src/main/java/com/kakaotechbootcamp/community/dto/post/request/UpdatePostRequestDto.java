@@ -19,7 +19,7 @@ public class UpdatePostRequestDto {
     private List<ImageMetaInfo> postImages;
 
     public boolean isAllFieldsNull() {
-        return title == null && content == null && (postImages == null || postImages.isEmpty());
+        return title == null && content == null && postImages == null;
     }
 
     public boolean isTitleEmpty() {
