@@ -22,7 +22,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
         SELECT new com.kakaotechbootcamp.community.dto.post.response.PostSummaryResponseDto(
             p.id, p.title, p.createdAt, p.updatedAt,
             u.id, u.nickname, u.profileImage,
-            pc.likeCount, pc.viewCount, pc.commentCount
+            pc.likeCount, pc.commentCount, pc.viewCount
         )
         FROM Post p
         JOIN p.user u

@@ -16,7 +16,7 @@ public class ImageService {
     public CreateImageUrlResponseDto uploadImage(List<MultipartFile> files) {
 
         List<String> images = new ArrayList<>();
-        images.add("https://s3.ap-northeast-2.amazonaws.com/mybucket/default-profile.png");
+        images.add("https://picsum.photos/200?0");
 
         return new CreateImageUrlResponseDto(images);
     }

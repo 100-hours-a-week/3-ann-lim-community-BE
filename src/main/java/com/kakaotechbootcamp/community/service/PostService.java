@@ -164,7 +164,7 @@ public class PostService {
 
         List<ImageMetaInfo> newImages = updatePostRequest.getPostImages();
 
-        if (newImages == null && newImages.isEmpty()) {
+        if (newImages == null || (newImages != null && newImages.isEmpty())) {
             for (Image image : existingImages) {
                 image.delete();
             }
