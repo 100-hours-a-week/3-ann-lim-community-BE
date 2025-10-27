@@ -19,7 +19,8 @@ public enum ErrorCode {
     INVALID_REQUEST_BODY(HttpStatus.BAD_REQUEST, "요청 본문이 비어있습니다."),
     NO_UPDATE_CONTENT(HttpStatus.UNPROCESSABLE_ENTITY, "수정할 내용이 없습니다."),
     INVALID_TITLE(HttpStatus.UNPROCESSABLE_ENTITY, "제목은 공백일 수 없습니다."),
-    INVALID_CONTENT(HttpStatus.UNPROCESSABLE_ENTITY, "내용은 공백일 수 없습니다.");
+    INVALID_CONTENT(HttpStatus.UNPROCESSABLE_ENTITY, "내용은 공백일 수 없습니다."),
+    ALREADY_LIKED(HttpStatus.CONFLICT, "이미 좋아요를 누른 게시글입니다.");
 
     private final HttpStatus status;
     private final String message;

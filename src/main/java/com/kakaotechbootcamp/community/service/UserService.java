@@ -29,7 +29,7 @@ public class UserService {
 
         //Todo: JWT 구현 후 수정
         User user = userRepository.findByIdAndDeletedAtIsNull(1L)
-                .orElseThrow();
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         return new UserProfileResponseDto(user.getProfileImage());
     }

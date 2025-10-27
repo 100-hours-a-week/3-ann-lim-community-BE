@@ -226,6 +226,11 @@ public class PostService {
         User user = userRepository.findByIdAndDeletedAtIsNull(1L)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
+        boolean isLiked = postLikeRepository.existsByPostIdAndUserId(postId, user.getId());
+        if (isLiked) {
+            throw new CustomException(ErrorCode.ALREADY_LIKED);
+        }
+
         PostLike postLike = new PostLike(post, user);
         postLikeRepository.save(postLike);
 
