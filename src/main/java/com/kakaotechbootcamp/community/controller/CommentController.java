@@ -8,6 +8,7 @@ import com.kakaotechbootcamp.community.dto.comment.response.UpdateCommentRespons
 import com.kakaotechbootcamp.community.dto.global.response.ApiResponse;
 import com.kakaotechbootcamp.community.service.CommentService;
 import com.kakaotechbootcamp.community.validation.ValidationOrder;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,10 +44,11 @@ public class CommentController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<?>> addComment(
+            HttpServletRequest request,
             @PathVariable Long postId,
             @Validated(ValidationOrder.class) @RequestBody CreateCommentRequestDto createCommentRequest) {
 
-        CreateCommentResponseDto response = commentService.addComment(postId, createCommentRequest);
+        CreateCommentResponseDto response = commentService.addComment(request, postId, createCommentRequest);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -60,10 +62,11 @@ public class CommentController {
 
     @PatchMapping("/{commentId}")
     public ResponseEntity<ApiResponse<?>> updateComment(
+            HttpServletRequest request,
             @PathVariable Long postId, @PathVariable Long commentId,
             @RequestBody UpdateCommentRequestDto updateCommentRequest) {
 
-        UpdateCommentResponseDto response = commentService.updateComment(postId, commentId, updateCommentRequest);
+        UpdateCommentResponseDto response = commentService.updateComment(request, postId, commentId, updateCommentRequest);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -76,9 +79,9 @@ public class CommentController {
     }
 
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<ApiResponse<?>> deleteComment(@PathVariable Long postId, @PathVariable Long commentId) {
+    public ResponseEntity<ApiResponse<?>> deleteComment(HttpServletRequest request, @PathVariable Long postId, @PathVariable Long commentId) {
 
-        commentService.deleteComment(postId, commentId);
+        commentService.deleteComment(request, postId, commentId);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

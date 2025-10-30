@@ -1,6 +1,5 @@
 package com.kakaotechbootcamp.community.dto.global.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
 

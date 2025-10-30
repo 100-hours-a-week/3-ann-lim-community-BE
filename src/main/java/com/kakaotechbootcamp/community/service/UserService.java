@@ -11,6 +11,9 @@ import com.kakaotechbootcamp.community.entity.User;
 import com.kakaotechbootcamp.community.exception.CustomException;
 import com.kakaotechbootcamp.community.exception.ErrorCode;
 import com.kakaotechbootcamp.community.repository.*;
+import com.kakaotechbootcamp.community.jwt.JwtProvider;
+import com.kakaotechbootcamp.community.jwt.JwtTokenExtractor;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,10 +28,12 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
-    public UserProfileResponseDto getProfileImage() {
+    public UserProfileResponseDto getProfileImage(HttpServletRequest request) {
 
-        //Todo: JWT 구현 후 수정
-        User user = userRepository.findByIdAndDeletedAtIsNull(1L)
+        Long userId = (Long) request.getAttribute("userId");
+        System.out.println("userId: " + userId);
+
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         return new UserProfileResponseDto(user.getProfileImage());
@@ -57,7 +62,9 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public EditUserResponseDto getUserForEdit(Long userId) {
+    public EditUserResponseDto getUserForEdit(HttpServletRequest request, Long userId) {
+
+        validateUser(request, userId);
 
         User user = userRepository.findByIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -65,7 +72,11 @@ public class UserService {
         return EditUserResponseDto.of(user.getId(), user.getEmail(), user.getNickname(), user.getProfileImage());
     }
 
-    public UpdateUserResponseDto updateUserInfo(Long userId, UpdateUserRequestDto updateUserRequest) {
+
+
+    public UpdateUserResponseDto updateUserInfo(HttpServletRequest request, Long userId, UpdateUserRequestDto updateUserRequest) {
+
+        validateUser(request, userId);
 
         if (updateUserRequest == null) {
             throw new CustomException(ErrorCode.INVALID_REQUEST_BODY);
@@ -87,8 +98,9 @@ public class UserService {
         return new UpdateUserResponseDto(user.getId());
     }
 
-    //Todo: JWT 구현 후 수정
-    public void updateUserPassword(Long userId, UpdateUserPasswordRequestDto updateUserPasswordRequest) {
+    public void updateUserPassword(HttpServletRequest request, Long userId, UpdateUserPasswordRequestDto updateUserPasswordRequest) {
+
+        validateUser(request, userId);
 
         if (!updateUserPasswordRequest.getPassword().equals(updateUserPasswordRequest.getPasswordConfirm())) {
             throw new CustomException(ErrorCode.MISMATCH_PASSWORD);
@@ -100,11 +112,20 @@ public class UserService {
         user.updateUserPassword(passwordEncoder.encode(updateUserPasswordRequest.getPassword()));
     }
 
-    //Todo: JWT 구현 후 수정
-    public void deleteUser(Long userId) {
+    public void deleteUser(HttpServletRequest request, Long userId) {
+
+        validateUser(request, userId);
 
         User user = userRepository.findByIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         user.delete();
+    }
+
+    private static void validateUser(HttpServletRequest request, Long userId) {
+        Long requestUserId = (Long) request.getAttribute("userId");
+
+        if (!requestUserId.equals(userId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
     }
 }

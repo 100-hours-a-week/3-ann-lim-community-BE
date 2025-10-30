@@ -20,7 +20,10 @@ public enum ErrorCode {
     NO_UPDATE_CONTENT(HttpStatus.UNPROCESSABLE_ENTITY, "수정할 내용이 없습니다."),
     INVALID_TITLE(HttpStatus.UNPROCESSABLE_ENTITY, "제목은 공백일 수 없습니다."),
     INVALID_CONTENT(HttpStatus.UNPROCESSABLE_ENTITY, "내용은 공백일 수 없습니다."),
-    ALREADY_LIKED(HttpStatus.CONFLICT, "이미 좋아요를 누른 게시글입니다.");
+    ALREADY_LIKED(HttpStatus.CONFLICT, "이미 좋아요를 누른 게시글입니다."),
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "인증이 유효하지 않습니다."),
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증이 필요합니다. 다시 로그인해주세요."),
+    FORBIDDEN(HttpStatus.FORBIDDEN, "접근 권한이 없습니다.");
 
     private final HttpStatus status;
     private final String message;

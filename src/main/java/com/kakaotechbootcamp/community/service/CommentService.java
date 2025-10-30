@@ -16,6 +16,7 @@ import com.kakaotechbootcamp.community.repository.CommentRepository;
 import com.kakaotechbootcamp.community.repository.PostCountRepository;
 import com.kakaotechbootcamp.community.repository.PostRepository;
 import com.kakaotechbootcamp.community.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -54,13 +55,14 @@ public class CommentService {
         }
     }
 
-    public CreateCommentResponseDto addComment(Long postId, CreateCommentRequestDto createCommentRequest) {
+    public CreateCommentResponseDto addComment(HttpServletRequest request, Long postId, CreateCommentRequestDto createCommentRequest) {
 
         Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
-        //Todo: JWT 구현 후 수정
-        User user = userRepository.findByIdAndDeletedAtIsNull(1L)
+        Long userId = (Long) request.getAttribute("userId");
+
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Comment comment = new Comment(post, user, createCommentRequest.getContent());
@@ -74,7 +76,12 @@ public class CommentService {
         return new CreateCommentResponseDto(comment.getId());
     }
 
-    public UpdateCommentResponseDto updateComment(Long postId, Long commentId, UpdateCommentRequestDto updateCommentRequest) {
+    public UpdateCommentResponseDto updateComment(HttpServletRequest request, Long postId, Long commentId, UpdateCommentRequestDto updateCommentRequest) {
+
+        Comment comment  = commentRepository.findByIdAndPostIdAndDeletedAtIsNull(commentId, postId)
+                .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
+
+        validateCommentWriter(request, comment.getUser().getId());
 
         if (updateCommentRequest == null) {
             throw new CustomException(ErrorCode.INVALID_REQUEST_BODY);
@@ -84,23 +91,31 @@ public class CommentService {
             throw new CustomException(ErrorCode.NO_UPDATE_CONTENT);
         }
 
-        Comment comment  = commentRepository.findByIdAndPostIdAndDeletedAtIsNull(commentId, postId)
-                .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
-
         comment.update(updateCommentRequest.getContent());
 
         return new UpdateCommentResponseDto(comment.getId());
     }
 
-    public void deleteComment(Long postId, Long commentId) {
+    public void deleteComment(HttpServletRequest request, Long postId, Long commentId) {
 
         Comment comment = commentRepository.findByIdAndPostIdAndDeletedAtIsNull(commentId, postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
+
+        validateCommentWriter(request, comment.getUser().getId());
+
         comment.delete();
 
         PostCount postCount = postCountRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_COUNT_NOT_FOUND));
 
         postCount.decreaseCommentCount();
+    }
+
+    private static void validateCommentWriter(HttpServletRequest request, Long authorId) {
+        Long userId = (Long) request.getAttribute("userId");
+
+        if (!authorId.equals(userId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
     }
 }

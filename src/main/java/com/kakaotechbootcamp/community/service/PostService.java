@@ -11,6 +11,7 @@ import com.kakaotechbootcamp.community.exception.CustomException;
 import com.kakaotechbootcamp.community.exception.ErrorCode;
 import com.kakaotechbootcamp.community.repository.*;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -54,11 +55,12 @@ public class PostService {
         }
     }
 
-    public CreatePostResponseDto addPost(CreatePostRequestDto createPostRequest) {
+    public CreatePostResponseDto addPost(HttpServletRequest request, CreatePostRequestDto createPostRequest) {
 
-        //Todo: JWT 구현 후 수정
-        User user = userRepository.findByIdAndDeletedAtIsNull(1L)
-                .orElseThrow();
+        Long userId = (Long) request.getAttribute("userId");
+
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Post post = new Post(user, createPostRequest.getTitle(), createPostRequest.getContent());
         postRepository.save(post);
@@ -78,11 +80,9 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PostResponseDto getPost(Long postId) {
+    public PostResponseDto getPost(HttpServletRequest request, Long postId) {
 
-        //Todo: JWT 구현 후 수정
-        User user = userRepository.findByIdAndDeletedAtIsNull(1L)
-                .orElseThrow();
+        Long userId = (Long) request.getAttribute("userId");
 
         Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
@@ -99,7 +99,7 @@ public class PostService {
         PostCount postCount = postCountRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_COUNT_NOT_FOUND));
 
-        boolean isLiked = postLikeRepository.existsByPostIdAndUserId(postId, user.getId());
+        boolean isLiked = postLikeRepository.existsByPostIdAndUserId(postId, userId);
 
         User author = post.getUser();
 
@@ -114,10 +114,12 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public EditPostResponseDto getPostForEdit(Long postId) {
+    public EditPostResponseDto getPostForEdit(HttpServletRequest request, Long postId) {
 
         Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+
+        validatePostWriter(request, post.getUser().getId());
 
         List<Image> images = imageRepository.findAllByPostIdAndDeletedAtIsNull(postId);
 
@@ -133,7 +135,12 @@ public class PostService {
         return EditPostResponseDto.of(post.getId(), post.getTitle(), post.getContent(), imageInfoList);
     }
 
-    public UpdatePostResponseDto updatePost(Long postId, UpdatePostRequestDto updatePostRequest) {
+    public UpdatePostResponseDto updatePost(HttpServletRequest request, Long postId, UpdatePostRequestDto updatePostRequest) {
+
+        Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+
+        validatePostWriter(request, post.getUser().getId());
 
         if (updatePostRequest == null) {
             throw new CustomException(ErrorCode.INVALID_REQUEST_BODY);
@@ -154,9 +161,6 @@ public class PostService {
                 throw new CustomException(ErrorCode.INVALID_CONTENT);
             }
         }
-
-        Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
-                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         post.update(updatePostRequest.getTitle(), updatePostRequest.getContent());
 
@@ -198,10 +202,12 @@ public class PostService {
         return new UpdatePostResponseDto(post.getId());
     }
 
-    public void deletePost(Long postId) {
+    public void deletePost(HttpServletRequest request, Long postId) {
 
         Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+
+        validatePostWriter(request, post.getUser().getId());
 
         post.setPostCountNull();
         post.delete();
@@ -217,13 +223,22 @@ public class PostService {
         postCountRepository.deleteById(postId);
     }
 
-    public CreateLikeResponseDto addLike(Long postId) {
+    private static void validatePostWriter(HttpServletRequest request, Long authorId) {
+        Long userId = (Long) request.getAttribute("userId");
+
+        if (!authorId.equals(userId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
+    }
+
+    public CreateLikeResponseDto addLike(HttpServletRequest request, Long postId) {
 
         Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
-        //Todo: JWT 구현 후 수정
-        User user = userRepository.findByIdAndDeletedAtIsNull(1L)
+        Long userId = (Long) request.getAttribute("userId");
+
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         boolean isLiked = postLikeRepository.existsByPostIdAndUserId(postId, user.getId());
@@ -242,10 +257,11 @@ public class PostService {
         return new CreateLikeResponseDto(postLike.getId());
     }
 
-    public void deleteLike(Long postId) {
+    public void deleteLike(HttpServletRequest request, Long postId) {
 
-        //Todo: JWT 구현 후 수정
-        PostLike postLike = postLikeRepository.findByPostIdAndUserId(postId, 1L)
+        Long userId = (Long) request.getAttribute("userId");
+
+        PostLike postLike = postLikeRepository.findByPostIdAndUserId(postId, userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_LIKE_NOT_FOUND));
 
         postLikeRepository.delete(postLike);

@@ -10,6 +10,7 @@ import com.kakaotechbootcamp.community.dto.user.response.UpdateUserResponseDto;
 import com.kakaotechbootcamp.community.dto.user.response.UserProfileResponseDto;
 import com.kakaotechbootcamp.community.service.UserService;
 import com.kakaotechbootcamp.community.validation.ValidationOrder;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +25,9 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<?>> getProfileImage() {
+    public ResponseEntity<ApiResponse<?>> getProfileImage(HttpServletRequest request) {
 
-        UserProfileResponseDto response = userService.getProfileImage();
+        UserProfileResponseDto response = userService.getProfileImage(request);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -55,9 +56,9 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<ApiResponse<?>> getUserForEdit(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponse<?>> getUserForEdit(HttpServletRequest request, @PathVariable Long userId) {
 
-        EditUserResponseDto response =  userService.getUserForEdit(userId);
+        EditUserResponseDto response =  userService.getUserForEdit(request, userId);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -71,10 +72,11 @@ public class UserController {
 
     @PatchMapping("/{userId}")
     public ResponseEntity<ApiResponse<?>> updateUserInfo(
+            HttpServletRequest request,
             @PathVariable Long userId,
             @Validated(ValidationOrder.class) @RequestBody UpdateUserRequestDto updateUserRequest) {
 
-        UpdateUserResponseDto response =  userService.updateUserInfo(userId, updateUserRequest);
+        UpdateUserResponseDto response =  userService.updateUserInfo(request, userId, updateUserRequest);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -88,10 +90,11 @@ public class UserController {
 
     @PatchMapping("/{userId}/password")
     public ResponseEntity<ApiResponse<?>> updateUserPassword(
+            HttpServletRequest request,
             @PathVariable Long userId,
             @Validated(ValidationOrder.class) @RequestBody UpdateUserPasswordRequestDto updateUserPasswordRequest) {
 
-         userService.updateUserPassword(userId, updateUserPasswordRequest);
+         userService.updateUserPassword(request, userId, updateUserPasswordRequest);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -104,9 +107,9 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<ApiResponse<?>> deleteUser(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponse<?>> deleteUser(HttpServletRequest request, @PathVariable Long userId) {
 
-        userService.deleteUser(userId);
+        userService.deleteUser(request, userId);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
