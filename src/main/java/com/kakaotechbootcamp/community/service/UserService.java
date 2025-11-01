@@ -31,7 +31,6 @@ public class UserService {
     public UserProfileResponseDto getProfileImage(HttpServletRequest request) {
 
         Long userId = (Long) request.getAttribute("userId");
-        System.out.println("userId: " + userId);
 
         User user = userRepository.findByIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));

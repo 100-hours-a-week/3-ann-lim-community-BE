@@ -1,6 +1,5 @@
 package com.kakaotechbootcamp.community.dto.user.response;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 

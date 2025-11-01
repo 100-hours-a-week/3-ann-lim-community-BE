@@ -14,11 +14,13 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
@@ -85,15 +87,16 @@ public class JwtService {
         return new TokenResponseDto(deletedAccessToken);
     }
 
-//    private void addTokenCookies(HttpServletResponse response, TokenPairDto tokenPairDto) {
-//        addRefreshTokenCookie(response, "refresh_token", tokenPairDto.getRefreshToken(), REFRESH_TOKEN_EXPIRATION);
-//    }
-
     public void addRefreshTokenCookie(HttpServletResponse response, String name, String value, int maxAge) {
-        Cookie cookie = new Cookie(name, value);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(maxAge);
-        response.addCookie(cookie);
+        ResponseCookie cookie = ResponseCookie.from(name, value)
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .path("/")
+                .maxAge(maxAge)
+                .domain("localhost")
+                .build();
+
+        response.addHeader("Set-Cookie", cookie.toString());
     }
 }
