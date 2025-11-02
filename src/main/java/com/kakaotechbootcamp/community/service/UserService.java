@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
@@ -118,6 +119,8 @@ public class UserService {
         User user = userRepository.findByIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         user.delete();
+
+        refreshTokenRepository.deleteAllByUserId(userId);
     }
 
     private static void validateUser(HttpServletRequest request, Long userId) {

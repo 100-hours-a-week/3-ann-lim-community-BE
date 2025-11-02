@@ -10,17 +10,14 @@ import com.kakaotechbootcamp.community.repository.RefreshTokenRepository;
 import com.kakaotechbootcamp.community.repository.UserRepository;
 import com.kakaotechbootcamp.community.jwt.JwtProvider;
 import com.kakaotechbootcamp.community.jwt.JwtTokenExtractor;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
@@ -29,11 +26,9 @@ public class JwtService {
 
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final JwtTokenExtractor jwtTokenExtractor;
 
-    private static final int ACCESS_TOKEN_EXPIRATION = 15 * 60;
     private static final int REFRESH_TOKEN_EXPIRATION = 14 * 24 * 3600;
 
     public TokenResponseDto reissueAccessToken(HttpServletRequest request, HttpServletResponse response) {
