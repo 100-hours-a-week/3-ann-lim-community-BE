@@ -11,6 +11,7 @@ import com.kakaotechbootcamp.community.dto.user.response.UserProfileResponseDto;
 import com.kakaotechbootcamp.community.service.UserService;
 import com.kakaotechbootcamp.community.validation.ValidationOrder;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -107,9 +108,9 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<ApiResponse<?>> deleteUser(HttpServletRequest request, @PathVariable Long userId) {
+    public ResponseEntity<ApiResponse<?>> deleteUser(HttpServletRequest request, HttpServletResponse response,  @PathVariable Long userId) {
 
-        userService.deleteUser(request, userId);
+        userService.deleteUser(request, response, userId);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

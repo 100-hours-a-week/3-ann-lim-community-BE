@@ -18,7 +18,7 @@ public class JwtProvider {
     private final Key key = Keys.hmacShaKeyFor(Base64.getDecoder().decode("dGhhZGxya2Rrdm13bGFrZnJocmpzcmtkZ2tycGdvZHFocmdrcnBkaGZvZGhmb3RrZmRrdGRtYXVzd2hncnB0ZWs="));
 
     public String createAccessToken(Long userId) {
-        long accessTtlSec = 15 * 60;
+        long accessTtlSec = 10;
 
         return Jwts.builder()
                 .setSubject(String.valueOf(userId))
@@ -39,17 +39,6 @@ public class JwtProvider {
                 .setId(UUID.randomUUID().toString())
                 .setIssuedAt(new Date())
                 .setExpiration(Date.from(Instant.now().plusSeconds(refreshTtlSec)))
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
-    }
-
-    public String deleteAccessToken(Long userId) {
-        return Jwts.builder()
-                .setSubject(String.valueOf(userId))
-                .claim("typ", "access")
-                .setId(UUID.randomUUID().toString())
-                .setIssuedAt(new Date())
-                .setExpiration(Date.from(Instant.now().plusSeconds(0)))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }

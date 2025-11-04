@@ -1,7 +1,6 @@
 package com.kakaotechbootcamp.community.service;
 
 import com.kakaotechbootcamp.community.dto.token.TokenPairDto;
-import com.kakaotechbootcamp.community.dto.token.TokenResponseDto;
 import com.kakaotechbootcamp.community.dto.user.request.UserLoginRequestDto;
 import com.kakaotechbootcamp.community.dto.user.response.UserLoginResponseDto;
 import com.kakaotechbootcamp.community.entity.User;
@@ -14,8 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +40,7 @@ public class AuthService {
         return UserLoginResponseDto.of(tokenPairDto.getAccessToken(), user.getId());
     }
 
-    public TokenResponseDto logout(HttpServletRequest request, HttpServletResponse response) {
-        return jwtService.deleteTokens(request, response);
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        jwtService.revokeRefreshToken(request);
     }
 }

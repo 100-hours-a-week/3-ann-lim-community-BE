@@ -22,6 +22,7 @@ public enum ErrorCode {
     INVALID_CONTENT(HttpStatus.UNPROCESSABLE_ENTITY, "내용은 공백일 수 없습니다."),
     ALREADY_LIKED(HttpStatus.CONFLICT, "이미 좋아요를 누른 게시글입니다."),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "인증이 유효하지 않습니다."),
+    EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "이용 시간이 만료되었습니다. 다시 로그인해주세요."),
     FORBIDDEN(HttpStatus.FORBIDDEN, "접근 권한이 없습니다.");
 
     private final HttpStatus status;

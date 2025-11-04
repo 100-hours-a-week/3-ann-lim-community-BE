@@ -31,6 +31,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         String method = request.getMethod();
 
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            return true;
+        }
+
         if (path.startsWith("/auth") && method.equals("POST")) {
             return true;
         }
@@ -51,26 +55,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         Optional<String> token = jwtTokenExtractor.extractAccessToken(request);
 
-        if (token.isEmpty()) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        if (!jwtValidator.validateAndSetAttributes(token.get(), request)) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json;charset=UTF-8");
-
-            String json = """
-                {
-                    "success": false,
-                    "status": 401,
-                    "message": "인증이 필요합니다. 다시 로그인해주세요.",
-                    "data": null
-                }
-            """;
-
-            response.getWriter().write(json);
-
+        if (token.isEmpty() || !jwtValidator.validateAndSetAttributes(token.get(), request)) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 

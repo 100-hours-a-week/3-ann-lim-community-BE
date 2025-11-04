@@ -41,7 +41,7 @@ public class JwtService {
                 .orElseThrow(() -> new CustomException(ErrorCode.INVALID_TOKEN));
 
         if (refreshTokenInfo.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new CustomException(ErrorCode.INVALID_TOKEN);
+            throw new CustomException(ErrorCode.EXPIRED_REFRESH_TOKEN);
         }
 
         Long userId = Long.valueOf(parsedRefreshToken.getBody().getSubject());
@@ -49,7 +49,7 @@ public class JwtService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         String newAccessToken = jwtProvider.createAccessToken(user.getId());
-        addRefreshTokenCookie(response, "refresh_token", refreshToken, REFRESH_TOKEN_EXPIRATION);
+//        addRefreshTokenCookie(response, "refresh_token", refreshToken, REFRESH_TOKEN_EXPIRATION);
 
         return new TokenResponseDto(newAccessToken);
     }
@@ -64,24 +64,6 @@ public class JwtService {
         return new TokenPairDto(accessToken, refreshToken);
     }
 
-    public TokenResponseDto deleteTokens(HttpServletRequest request, HttpServletResponse response) {
-
-        Long userId = (Long) request.getAttribute("userId");
-        String deletedAccessToken = jwtProvider.deleteAccessToken(userId);
-
-        String refreshToken = jwtTokenExtractor.extractRefreshToken(request)
-                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_TOKEN));
-
-        RefreshToken refreshTokenEntity = refreshTokenRepository.findByRefreshTokenAndRevokedFalse(refreshToken)
-                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_TOKEN));
-
-        refreshTokenEntity.revoke();
-
-        addRefreshTokenCookie(response, "refresh_token", refreshToken, 0);
-
-        return new TokenResponseDto(deletedAccessToken);
-    }
-
     public void addRefreshTokenCookie(HttpServletResponse response, String name, String value, int maxAge) {
         ResponseCookie cookie = ResponseCookie.from(name, value)
                 .httpOnly(true)
@@ -93,5 +75,24 @@ public class JwtService {
                 .build();
 
         response.addHeader("Set-Cookie", cookie.toString());
+    }
+
+    public void revokeRefreshToken(HttpServletRequest request) {
+
+        String refreshToken = jwtTokenExtractor.extractRefreshToken(request)
+                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_TOKEN));
+
+        RefreshToken refreshTokenEntity = refreshTokenRepository.findByRefreshTokenAndRevokedFalse(refreshToken)
+                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_TOKEN));
+
+        refreshTokenEntity.revoke();
+    }
+
+    public void expireRefreshToken(HttpServletRequest request, HttpServletResponse response) {
+
+        Long userId = Long.valueOf(request.getAttribute("userId").toString());
+
+        String deletedRefreshToken = jwtProvider.deleteRefreshToken(userId);
+        addRefreshTokenCookie(response, "refresh_token", deletedRefreshToken, 0);
     }
 }

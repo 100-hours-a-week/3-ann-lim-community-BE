@@ -14,6 +14,7 @@ import com.kakaotechbootcamp.community.repository.*;
 import com.kakaotechbootcamp.community.jwt.JwtProvider;
 import com.kakaotechbootcamp.community.jwt.JwtTokenExtractor;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,12 +27,14 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final JwtProvider jwtProvider;
+    private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
     public UserProfileResponseDto getProfileImage(HttpServletRequest request) {
 
-        Long userId = (Long) request.getAttribute("userId");
+        Long userId = Long.valueOf(request.getAttribute("userId").toString());
 
         User user = userRepository.findByIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -112,7 +115,7 @@ public class UserService {
         user.updateUserPassword(passwordEncoder.encode(updateUserPasswordRequest.getPassword()));
     }
 
-    public void deleteUser(HttpServletRequest request, Long userId) {
+    public void deleteUser(HttpServletRequest request, HttpServletResponse response, Long userId) {
 
         validateUser(request, userId);
 
@@ -121,10 +124,11 @@ public class UserService {
         user.delete();
 
         refreshTokenRepository.deleteAllByUserId(userId);
+        jwtService.expireRefreshToken(request, response);
     }
 
     private static void validateUser(HttpServletRequest request, Long userId) {
-        Long requestUserId = (Long) request.getAttribute("userId");
+        Long requestUserId = Long.valueOf(request.getAttribute("userId").toString());
 
         if (!requestUserId.equals(userId)) {
             throw new CustomException(ErrorCode.FORBIDDEN);

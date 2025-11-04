@@ -41,7 +41,7 @@ public class AuthController {
     @DeleteMapping
     public ResponseEntity<ApiResponse<?>> logout(HttpServletRequest request, HttpServletResponse response) {
 
-        TokenResponseDto tokenResponseDto = authService.logout(request, response);
+        authService.logout(request, response);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -49,7 +49,7 @@ public class AuthController {
                         .success(true)
                         .status(HttpStatus.OK.value())
                         .message("로그아웃 성공")
-                        .data(tokenResponseDto)
+                        .data(null)
                         .build());
     }
 }
