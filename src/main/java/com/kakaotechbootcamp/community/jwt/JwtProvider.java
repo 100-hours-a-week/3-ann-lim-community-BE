@@ -18,7 +18,7 @@ public class JwtProvider {
     private final Key key = Keys.hmacShaKeyFor(Base64.getDecoder().decode("dGhhZGxya2Rrdm13bGFrZnJocmpzcmtkZ2tycGdvZHFocmdrcnBkaGZvZGhmb3RrZmRrdGRtYXVzd2hncnB0ZWs="));
 
     public String createAccessToken(Long userId) {
-        long accessTtlSec = 10;
+        long accessTtlSec = 10 * 60; // 10분
 
         return Jwts.builder()
                 .setSubject(String.valueOf(userId))
