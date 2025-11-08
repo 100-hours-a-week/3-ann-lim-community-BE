@@ -42,5 +42,6 @@ public class AuthService {
 
     public void logout(HttpServletRequest request, HttpServletResponse response) {
         jwtService.revokeRefreshToken(request);
+        jwtService.expireRefreshToken(request, response);
     }
 }
