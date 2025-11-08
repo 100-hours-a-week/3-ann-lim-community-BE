@@ -68,6 +68,8 @@ public class JwtService {
         ResponseCookie cookie = ResponseCookie.from(name, value)
                 .httpOnly(true)
                 .path("/")
+                .secure(false)
+                .sameSite("None")
                 .maxAge(maxAge)
                 .build();
 
