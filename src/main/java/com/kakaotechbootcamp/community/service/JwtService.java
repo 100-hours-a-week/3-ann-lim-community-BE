@@ -67,7 +67,7 @@ public class JwtService {
     public void addRefreshTokenCookie(HttpServletResponse response, String name, String value, int maxAge) {
         ResponseCookie cookie = ResponseCookie.from(name, value)
                 .httpOnly(true)
-                .secure(true)
+                .secure(false)
                 .sameSite("None")
                 .path("/")
                 .maxAge(maxAge)
