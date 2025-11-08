@@ -71,7 +71,6 @@ public class JwtService {
                 .sameSite("None")
                 .path("/")
                 .maxAge(maxAge)
-                .domain("localhost")
                 .build();
 
         response.addHeader("Set-Cookie", cookie.toString());
