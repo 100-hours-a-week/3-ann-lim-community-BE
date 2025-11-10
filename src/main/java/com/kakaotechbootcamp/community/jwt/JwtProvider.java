@@ -43,17 +43,6 @@ public class JwtProvider {
                 .compact();
     }
 
-    public String deleteRefreshToken(Long userId) {
-        return Jwts.builder()
-                .setSubject(String.valueOf(userId))
-                .claim("typ", "refresh")
-                .setId(UUID.randomUUID().toString())
-                .setIssuedAt(new Date())
-                .setExpiration(Date.from(Instant.now().plusSeconds(0)))
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
-    }
-
     public Jws<Claims> parse(String jwt) {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt);
     }

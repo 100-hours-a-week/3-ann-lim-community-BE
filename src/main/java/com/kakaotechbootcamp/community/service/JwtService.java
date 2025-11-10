@@ -88,10 +88,6 @@ public class JwtService {
     }
 
     public void expireRefreshToken(HttpServletRequest request, HttpServletResponse response) {
-
-        Long userId = Long.valueOf(request.getAttribute("userId").toString());
-
-        String deletedRefreshToken = jwtProvider.deleteRefreshToken(userId);
-        addRefreshTokenCookie(response, "refresh_token", deletedRefreshToken, 0);
+        addRefreshTokenCookie(response, "refresh_token", null, 0);
     }
 }
