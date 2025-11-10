@@ -16,3 +16,6 @@ spring:
 
   profiles:
     active: dev
+
+frontend:
+  base-url: http://54.116.10.39:3000
