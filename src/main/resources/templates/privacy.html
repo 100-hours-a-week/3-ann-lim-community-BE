@@ -69,9 +69,9 @@
 
         backBtn.addEventListener("click", () => {
             if (from === "login") {
-                window.location.href = `${window.location.origin}/login`;
+                window.location.href = `${frontendBaseUrl}/login`;
             } else if (from === "signup") {
-                window.location.href = `${window.location.origin}/signup`;
+                window.location.href = `${frontendBaseUrl}/signup`;
             } else {
                 window.history.back();
             }
