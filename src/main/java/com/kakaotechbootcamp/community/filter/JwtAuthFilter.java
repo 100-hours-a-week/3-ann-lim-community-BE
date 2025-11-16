@@ -23,7 +23,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtValidator jwtValidator;
 
     private static final String[] EXCLUDED_PATHS = {
-            "/terms", "/privacy"
+            "/terms", "/privacy", "/health"
     };
 
     @Override
