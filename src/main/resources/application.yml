@@ -18,4 +18,4 @@ spring:
     active: dev
 
 frontend:
-  base-url: http://54.116.10.39:3000
+  base-url: http://54.180.48.31:3000
