@@ -9,11 +9,11 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://54.180.48.31:3000", "http://127.0.0.1:3000")
+                .allowedOrigins("https://community-ktb.online", "https://www.community-ktb.online")
                 .allowedMethods("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true)
-                .maxAge(3600)
-                .exposedHeaders("Set-Cookie");
+                .exposedHeaders("Set-Cookie")
+                .maxAge(3600);
     }
 }
