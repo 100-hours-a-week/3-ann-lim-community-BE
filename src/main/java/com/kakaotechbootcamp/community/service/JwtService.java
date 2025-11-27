@@ -49,7 +49,6 @@ public class JwtService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         String newAccessToken = jwtProvider.createAccessToken(user.getId());
-//        addRefreshTokenCookie(response, "refresh_token", refreshToken, REFRESH_TOKEN_EXPIRATION);
 
         return new TokenResponseDto(newAccessToken);
     }
