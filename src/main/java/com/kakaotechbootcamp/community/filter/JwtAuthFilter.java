@@ -35,6 +35,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return true;
         }
 
+        if (path.startsWith("/css/")) {
+            return true;
+        }
+
         if (path.startsWith("/api/auth") && method.equals("POST")) {
             return true;
         }
